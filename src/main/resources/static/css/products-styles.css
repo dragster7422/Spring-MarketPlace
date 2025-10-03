@@ -1,0 +1,71 @@
+:root {
+    --primary-color: #6D28D9;
+    --hover-color: #885dff;
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+    transition: color 0.2s;
+}
+.navbar-brand:hover {
+    color: var(--hover-color);
+    text-decoration: none;
+}
+
+.btn-primary {
+    font-weight: 600;
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+.btn-primary:hover {
+    background-color: #5b21b6;
+    border-color: #5b21b6;
+}
+
+/* Search button */
+.btn-search {
+    color: white;
+    font-weight: 600;
+    border: 2px solid white;
+    background-color: transparent;
+    padding: 0.5rem 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.2;
+    transition: all 0.2s;
+}
+.btn-search:hover {
+    border: 2px solid var(--primary-color);
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.product-card {
+    cursor: pointer;
+    transition: transform 0.2s;
+    max-width: 280px;
+    margin: 0 auto;
+}
+.product-card img {
+    height: 240px;
+    object-fit: contain;
+    background-color: #f8f9fa;
+    padding: 5px;
+}
+.product-card:hover {
+    transform: translateY(-5px);
+}
+.card-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.product-price {
+    margin-bottom: 0.2rem;
+    color: var(--primary-color);
+    font-weight: 700;
+    font-size: 1.2rem;
+}
