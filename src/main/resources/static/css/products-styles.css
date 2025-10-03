@@ -1,6 +1,6 @@
 :root {
-    --primary-color: #6D28D9;   /* фиолетовый */
-    --hover-color: #885dff;     /* светло-фиолетовый */
+    --primary-color: #6D28D9;
+    --hover-color: #885dff;
 }
 
 .navbar-brand {
@@ -26,11 +26,11 @@
 
 /* Search button */
 .btn-search {
+    color: white;
     font-weight: 600;
-    border: 2px solid var(--primary-color);
+    border: 2px solid white;
     background-color: transparent;
-    color: var(--primary-color);
-    padding: 0.5rem 0.7rem; /* равномерные отступы */
+    padding: 0.5rem 0.7rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -38,6 +38,7 @@
     transition: all 0.2s;
 }
 .btn-search:hover {
+    border: 2px solid var(--primary-color);
     background-color: var(--primary-color);
     color: white;
 }
@@ -45,7 +46,26 @@
 .product-card {
     cursor: pointer;
     transition: transform 0.2s;
+    max-width: 280px;
+    margin: 0 auto;
+}
+.product-card img {
+    height: 240px;
+    object-fit: contain;
+    background-color: #f8f9fa;
+    padding: 5px;
 }
 .product-card:hover {
     transform: translateY(-5px);
+}
+.card-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.product-price {
+    margin-bottom: 0.2rem;
+    color: var(--primary-color);
+    font-weight: 700;
+    font-size: 1.2rem;
 }
