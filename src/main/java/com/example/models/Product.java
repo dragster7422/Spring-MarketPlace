@@ -1,6 +1,7 @@
 package com.example.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,12 +20,17 @@ public class Product {
     private Long id;
 
     @Column
+    @NotBlank(message = "The title cannot be empty")
     private String title;
 
     @Column
+    @NotBlank(message = "The description cannot be empty")
+    @Size(min = 20, message = "The description must be more than 20 characters")
     private String description;
 
     @Column
+    @NotNull(message = "Price is required")
+    @DecimalMin(value = "0", message = "Price must be greater than 0")
     private Double price;
 
     @Column

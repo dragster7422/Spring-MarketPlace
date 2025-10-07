@@ -2,9 +2,11 @@ package com.example.controllers;
 
 import com.example.models.Product;
 import com.example.services.ProductService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,16 +29,31 @@ public class ProductController {
 
     /*	Add */
     @GetMapping("/product/add")
-    public String addProduct() {
+    public String addProduct(Model model) {
+        model.addAttribute("product", new Product());
         return "product-add";
     }
 
     @PostMapping("/product/add")
     public String addProduct(@RequestParam("previewImage") MultipartFile previewImage,
                              @RequestParam(value = "additionalImages", required = false) List<MultipartFile> additionalImages,
-                             @ModelAttribute Product product) throws IOException {
+                             @Valid @ModelAttribute Product product,
+                             BindingResult bindingResult,
+                             Model model) throws IOException {
 
-        boolean result = productService.saveProductWithImages(previewImage, additionalImages, product);
+        boolean isPreviewImageMissing = false;
+        if(previewImage == null || previewImage.isEmpty()) {
+            model.addAttribute("errorPreviewImageMissing", "Preview image is required");
+            isPreviewImageMissing = true;
+        }
+
+        if(bindingResult.hasErrors() ||  isPreviewImageMissing) {
+            return "product-add";
+        }
+
+        if(!productService.saveProductWithImages(previewImage, additionalImages, product)) {
+            return "product-add";
+        }
 
         return "redirect:/";
     }
