@@ -30,10 +30,11 @@
     <!-- Form add product -->
     <div class="card shadow-sm">
         <div class="card-body p-4">
-            <form th:action="@{/product/add}" method="post" enctype="multipart/form-data">
+            <form th:action="@{/product/add}" method="post" enctype="multipart/form-data" th:object="${product}">
                 <div class="mb-4">
                     <label for="previewImage" class="form-label fw-semibold">Preview Image</label>
-                    <input class="form-control" type="file" id="previewImage" name="previewImage" accept="image/*" required>
+                    <input class="form-control" type="file" id="previewImage" name="previewImage" accept="image/*">
+                    <div th:text="${errorPreviewImageMissing}" class="text-danger small mt-1"></div>
                 </div>
 
                 <div class="mb-4">
@@ -43,17 +44,20 @@
 
                 <div class="mb-4">
                     <label for="title" class="form-label fw-semibold">Title</label>
-                    <input class="form-control" type="text" id="title" name="title" placeholder="Enter product title" required>
+                    <input class="form-control" type="text" id="title" th:field="*{title}" placeholder="Enter product title">
+                    <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="text-danger small mt-1">Title Error</div>
                 </div>
 
                 <div class="mb-4">
                     <label for="description" class="form-label fw-semibold">Description</label>
-                    <textarea class="form-control" id="description" name="description" rows="4" placeholder="Enter product description" required></textarea>
+                    <textarea class="form-control" id="description" th:field="*{description}" rows="4" placeholder="Enter product description"></textarea>
+                    <div th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="text-danger small mt-1">Description Error</div>
                 </div>
 
                 <div class="mb-4">
                     <label for="price" class="form-label fw-semibold">Price</label>
-                    <input class="form-control" type="number" step="0.01" id="price" name="price" placeholder="Enter product price" required>
+                    <input class="form-control" type="number" step="0.01" id="price" th:field="*{price}" placeholder="Enter product price">
+                    <div th:if="${#fields.hasErrors('price')}" th:errors="*{price}" class="text-danger small mt-1">Price Error</div>
                 </div>
 
                 <div class="d-flex justify-content-between">
