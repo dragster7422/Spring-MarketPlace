@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MarketPlace | Product Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/products-styles.css">
+    <link rel="stylesheet" href="/css/product-add-styles.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f5;
+        }
+        .product-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+        }
+        .product-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 1rem;
+        }
+        .product-price {
+            font-size: 1.8rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--primary-color), var(--hover-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+        }
+        .product-description {
+            font-size: 1rem;
+            color: #4a4a4a;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+        .product-detail-image {
+            height: 350px;
+            object-fit: contain;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 8px;
+        }
+        .thumbnail-gallery {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            justify-content: center;
+        }
+        .thumbnail {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border 0.2s ease, transform 0.2s ease;
+        }
+        .thumbnail:hover, .thumbnail.active {
+            border: 2px solid var(--primary-color);
+            transform: scale(1.05);
+        }
+        .carousel-control-prev, .carousel-control-next {
+            width: 4%;
+            background: transparent;
+        }
+        .carousel-control-prev-icon, .carousel-control-next-icon {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%236D28D9'%3E%3Cpath d='M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z'/%3E%3C/svg%3E");
+        }
+        .carousel-control-next-icon {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%236D28D9'%3E%3Cpath d='M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+        }
+        .carousel-control-prev:hover, .carousel-control-next:hover {
+            opacity: 1;
+        }
+        .carousel-indicators [data-bs-target] {
+            background-color: var(--primary-color);
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .btn-buy {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            font-weight: 600;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            transition: all 0.2s;
+            font-size: 1.1rem;
+            color: white;
+        }
+        .btn-buy:hover {
+            background-color: var(--hover-color);
+            border-color: var(--hover-color);
+            transform: translateY(-2px);
+            color: white;
+        }
+        .btn-back {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+        @media (max-width: 768px) {
+            .product-container {
+                padding: 1.5rem;
+            }
+            .product-title {
+                font-size: 1.8rem;
+            }
+            .product-detail-image {
+                height: 250px;
+            }
+            .thumbnail {
+                width: 50px;
+                height: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Navbar -->
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container d-flex justify-content-between align-items-center">
+        <a class="navbar-brand" th:href="@{/}">MarketPlace</a>
+    </div>
+</nav>
+
+<!-- Content -->
+<div class="container my-5">
+    <div class="product-container">
+        <!-- Buttons -->
+        <div class="d-flex justify-content-between mb-3">
+            <a th:href="@{/}" class="btn-back">Back</a>
+            <a th:href="@{/product/{id}/edit(id=${product.id})}" class="btn-back">Edit</a>
+        </div>
+
+        <!-- Product Title -->
+        <h1 class="product-title" th:text="${product.title}">Product Title</h1>
+
+        <!-- Product Image and Details -->
+        <div class="row g-4">
+            <!-- Image Carousel -->
+            <div class="col-md-6">
+                <div id="productCarousel" class="carousel slide" th:if="${!#lists.isEmpty(product.images)}">
+                    <!-- Carousel Indicators -->
+                    <div class="carousel-indicators" th:if="${#lists.size(product.images) > 1}">
+                        <button type="button"
+                                th:each="image, iterStat : ${product.images}"
+                                th:data-bs-slide-to="${iterStat.index}"
+                                th:classappend="${iterStat.index == 0} ? 'active'"
+                                data-bs-target="#productCarousel"
+                                aria-label="'Slide ' + ${iterStat.count}"></button>
+                    </div>
+                    <!-- Carousel Items -->
+                    <div class="carousel-inner">
+                        <div class="carousel-item"
+                             th:each="image, iterStat : ${product.images}"
+                             th:classappend="${iterStat.index == 0} ? 'active'">
+                            <img class="product-detail-image d-block w-100"
+                                 th:src="@{${image.imageUrl}}"
+                                 th:alt="'Product photo ' + ${iterStat.count} + ' for ' + ${product.title}">
+                        </div>
+                    </div>
+                    <!-- Carousel Controls -->
+                    <div th:if="${#lists.size(product.images) > 1}">
+                        <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                </div>
+                <!-- Thumbnail Gallery -->
+                <div class="thumbnail-gallery" th:if="${!#lists.isEmpty(product.images)}">
+                    <img class="thumbnail"
+                         th:each="image, iterStat : ${product.images}"
+                         th:src="@{${image.imageUrl}}"
+                         th:alt="'Thumbnail ' + ${iterStat.count} + ' for ' + ${product.title}"
+                         th:classappend="${iterStat.index == 0} ? 'active'"
+                         th:onclick="'setCarouselSlide(' + ${iterStat.index} + ')'">
+                </div>
+                <!-- Fallback for no images -->
+                <img class="product-detail-image"
+                     th:if="${#lists.isEmpty(product.images)}"
+                     src="/images/placeholder.jpg"
+                     th:alt="'No image for ' + ${product.title}">
+            </div>
+
+            <!-- Product Details -->
+            <div class="col-md-6">
+                <p class="product-price"
+                   th:text="${#numbers.formatDecimal(product.price, 1, 'POINT', 0, 'POINT')} + ' ₴'">0 ₴</p>
+                <p class="product-description" th:text="${product.description}">Description...</p>
+                <p class="text-muted small" th:text="'Created on: ' + ${#temporals.format(product.dateOfCreated, 'dd.MM.yyyy')}">Created on: DD.MM.YYYY</p>
+                <a href="#" class="btn btn-buy">Buy</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="bg-dark text-white text-center py-3 mt-5">
+    <div class="container">
+        <p class="mb-0">&copy; 2025 MarketPlace. All rights reserved.</p>
+    </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Custom JS -->
+<script src="/js/js-product-details.js"></script>
+</body>
+</html>
