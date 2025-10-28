@@ -31,20 +31,20 @@
         <div class="row g-4">
             <!-- Image Carousel -->
             <div class="col-md-6">
-                <div id="productCarousel" class="carousel slide" th:if="${!#lists.isEmpty(product.images)}">
+                <div id="productCarousel" class="carousel slide" th:if="${!#lists.isEmpty(product.sortedImages)}">
                     <!-- Carousel Indicators -->
-                    <div class="carousel-indicators" th:if="${#lists.size(product.images) > 1}">
+                    <div class="carousel-indicators" th:if="${#lists.size(product.sortedImages) > 1}">
                         <button type="button"
-                                th:each="image, iterStat : ${product.images}"
+                                th:each="image, iterStat : ${product.sortedImages}"
                                 th:data-bs-slide-to="${iterStat.index}"
                                 th:classappend="${iterStat.index == 0} ? 'active'"
                                 data-bs-target="#productCarousel"
-                                aria-label="'Slide ' + ${iterStat.count}"></button>
+                                th:aria-label="'Slide ' + ${iterStat.count}"></button>
                     </div>
                     <!-- Carousel Items -->
                     <div class="carousel-inner">
                         <div class="carousel-item"
-                             th:each="image, iterStat : ${product.images}"
+                             th:each="image, iterStat : ${product.sortedImages}"
                              th:classappend="${iterStat.index == 0} ? 'active'">
                             <img class="product-detail-image d-block w-100"
                                  th:src="@{${image.imageUrl}}"
@@ -52,7 +52,7 @@
                         </div>
                     </div>
                     <!-- Carousel Controls -->
-                    <div th:if="${#lists.size(product.images) > 1}">
+                    <div th:if="${#lists.size(product.sortedImages) > 1}">
                         <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
                             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                             <span class="visually-hidden">Previous</span>
@@ -64,9 +64,9 @@
                     </div>
                 </div>
                 <!-- Thumbnail Gallery -->
-                <div class="thumbnail-gallery" th:if="${!#lists.isEmpty(product.images)}">
+                <div class="thumbnail-gallery" th:if="${!#lists.isEmpty(product.sortedImages)}">
                     <img class="thumbnail"
-                         th:each="image, iterStat : ${product.images}"
+                         th:each="image, iterStat : ${product.sortedImages}"
                          th:src="@{${image.imageUrl}}"
                          th:alt="'Thumbnail ' + ${iterStat.count} + ' for ' + ${product.title}"
                          th:classappend="${iterStat.index == 0} ? 'active'"
@@ -74,7 +74,7 @@
                 </div>
                 <!-- Fallback for no images -->
                 <img class="product-detail-image"
-                     th:if="${#lists.isEmpty(product.images)}"
+                     th:if="${#lists.isEmpty(product.sortedImages)}"
                      src="/images/placeholder.jpg"
                      th:alt="'No image for ' + ${product.title}">
             </div>
