@@ -35,13 +35,9 @@
                 <a th:href="@{'/product/' + ${product.id}}" class="text-decoration-none text-dark">
                     <div class="card h-100 shadow-sm product-card">
                         <div class="product-card-image-wrapper">
-                            <th:block th:if="${!#lists.isEmpty(product.images)}">
-                                <th:block th:each="image : ${product.images}">
-                                    <img th:if="${image.isPreviewImage}"
-                                         th:src="@{${image.imageUrl}}"
-                                         th:alt="${product.title}"/>
-                                </th:block>
-                            </th:block>
+                            <img th:if="${product.getPreviewImageUrl() != null}"
+                                 th:src="@{${product.getPreviewImageUrl()}}"
+                                 th:alt="${product.title}"/>
                         </div>
                         <div class="card-body">
                             <h5 class="card-title" th:text="${product.title}">Product Name</h5>

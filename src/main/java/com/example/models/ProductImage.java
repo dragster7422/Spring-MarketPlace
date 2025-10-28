@@ -25,7 +25,7 @@ public class ProductImage {
     private Long id;
 
     @Column
-    private String imageUrl;
+    private String imageDirectory;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
@@ -34,8 +34,12 @@ public class ProductImage {
     @Column
     private boolean isPreviewImage = false;
 
-    public ProductImage(String imageUrl, boolean isPreviewImage) {
-        this.imageUrl = imageUrl;
+    public ProductImage(String imageDirectory, boolean isPreviewImage) {
+        this.imageDirectory = imageDirectory;
         this.isPreviewImage = isPreviewImage;
+    }
+
+    public String getImageUrl() {
+        return "/" + imageDirectory;
     }
 }

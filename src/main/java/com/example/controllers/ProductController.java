@@ -36,7 +36,7 @@ public class ProductController {
                              @RequestParam(value = "additionalImages", required = false) List<MultipartFile> additionalImages,
                              @Valid @ModelAttribute Product product,
                              BindingResult bindingResult,
-                             Model model) throws IOException {
+                             Model model) {
 
         boolean isPreviewImageMissing = false;
         if(previewImage == null || previewImage.isEmpty()) {
@@ -48,7 +48,13 @@ public class ProductController {
             return "product-add";
         }
 
-        if(!productService.saveProductWithImages(previewImage, additionalImages, product)) {
+        try {
+            if(!productService.saveProductWithImages(previewImage, additionalImages, product)) {
+                model.addAttribute("errorSaving", "Failed to save product. Please try again.");
+                return "product-add";
+            }
+        } catch (IOException e) {
+            model.addAttribute("errorSaving", "Error uploading images: " + e.getMessage());
             return "product-add";
         }
 
@@ -56,10 +62,54 @@ public class ProductController {
     }
 
 
-    // Info
+    // Details
     @GetMapping("/product/{id}")
     public String productDetails(@PathVariable Long id, Model model) {
-        model.addAttribute("product", productService.getById(id));
+        Product product = productService.getById(id);
+        if(product == null) {
+            return "redirect:/";
+        }
+        model.addAttribute("product", product);
         return "product-details";
+    }
+
+    // Edit
+    @GetMapping("/product/{id}/edit")
+    public String productEdit(@PathVariable Long id, Model model) {
+        Product product = productService.getById(id);
+        if(product == null) {
+            return "redirect:/";
+        }
+        model.addAttribute("product", product);
+        return "product-edit";
+    }
+
+    @PostMapping("product/{id}/edit")
+    public String productEdit(@PathVariable Long id,
+                              @RequestParam(value = "previewImage", required = false) MultipartFile previewImage,
+                              @RequestParam(value = "additionalImages", required = false) List<MultipartFile> additionalImages,
+                              @RequestParam(value = "removeImageIds", required = false) List<Long> removeImageIds,
+                              @Valid @ModelAttribute Product product,
+                              BindingResult bindingResult,
+                              Model model) {
+
+        if(bindingResult.hasErrors()) {
+            return "product-edit";
+        }
+
+        if(!productService.updateProduct(id, previewImage, additionalImages, removeImageIds, product)) {
+            model.addAttribute("errorSaving", "Failed to update product. Please try again.");
+            return "product-edit";
+        }
+
+        return "redirect:/product/" + id;
+    }
+
+
+    // Delete
+    @PostMapping("/product/{id}/delete")
+    public String productDelete(@PathVariable Long id) {
+        productService.deleteProductById(id);
+        return "redirect:/";
     }
 }

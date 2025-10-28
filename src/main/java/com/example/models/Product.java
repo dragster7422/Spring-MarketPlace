@@ -6,7 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 
 @Entity(name = "products")
@@ -28,10 +30,10 @@ public class Product {
     @Size(min = 20, message = "The description must be more than 20 characters")
     private String description;
 
-    @Column
+    @Column(precision = 10, scale = 2)
     @NotNull(message = "Price is required")
-    @DecimalMin(value = "0", message = "Price must be greater than 0")
-    private Double price;
+    @DecimalMin(value = "0.0", message = "Price must be greater than 0")
+    private BigDecimal price;
 
     @Column
     private LocalDateTime dateOfCreated;
@@ -42,5 +44,41 @@ public class Product {
     @PrePersist
     private void init() {
         dateOfCreated = LocalDateTime.now();
+    }
+
+    public ProductImage getPreviewImage() {
+        if (images == null || images.isEmpty()) {
+            return null;
+        }
+        return images.stream()
+                .filter(ProductImage::isPreviewImage)
+                .findFirst()
+                .get();
+    }
+
+    public String getPreviewImageUrl() {
+        return getPreviewImage().getImageUrl();
+    }
+
+    public void addImages(List<ProductImage> newImages) {
+        this.images.addAll(newImages);
+    }
+
+    public void deleteImage(ProductImage image) {
+        this.images.remove(image);
+    }
+
+    public List<ProductImage> getSortedImages() {
+        if(images == null || images.isEmpty()) {
+            return List.of();
+        }
+
+        return images.stream()
+                .sorted((img1, img2) -> {
+                    if(img1.isPreviewImage()) return -1;
+                    if(img2.isPreviewImage()) return 1;
+                    return 0;
+                })
+                .toList();
     }
 }
