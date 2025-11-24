@@ -2,6 +2,7 @@ package com.example.services;
 
 import com.example.models.Product;
 import com.example.models.ProductImage;
+import com.example.models.User;
 import com.example.repositories.ProductRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -37,11 +38,23 @@ public class ProductService {
         productRepository.save(product);
     }
 
+    public List<Product> getProductsByOwnerId(Long ownerId) {
+        return productRepository.findByOwnerId(ownerId);
+    }
+
+    public boolean isOwner(Product product, User user) {
+        if (product == null || user == null) {
+            return false;
+        }
+        return product.getOwner() != null && product.getOwner().getId().equals(user.getId());
+    }
+
     public boolean saveProductWithImages(MultipartFile previewImage,
                                          List<MultipartFile> additionalImages,
-                                         Product product) throws IOException {
+                                         Product product,
+                                         User owner) throws IOException {
 
-        if(previewImage == null || previewImage.isEmpty() || product == null) return false;
+        if(previewImage == null || previewImage.isEmpty() || product == null || owner == null) return false;
 
         String uploadDir = ProductImage.DIRECTORY_IMAGES;
         Files.createDirectories(Paths.get(uploadDir));
@@ -75,6 +88,7 @@ public class ProductService {
         }
 
         product.setImages(images);
+        product.setOwner(owner);
         productRepository.save(product);
 
         return true;
@@ -85,7 +99,7 @@ public class ProductService {
                                                             boolean isPreviewImage) {
         try {
             if(file != null && !file.isEmpty()) {
-                String fileName = UUID.randomUUID()	 + "_" + file.getOriginalFilename();
+                String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
                 Path path = Paths.get(uploadDir + fileName);
                 Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
 
@@ -104,7 +118,6 @@ public class ProductService {
             log.error("Product with id {} not found", id);
             return;
         }
-        List<ProductImage> images = new ArrayList<>();
 
         for(var image : product.getImages()) {
             productImageService.deleteImageFromDisk(image);

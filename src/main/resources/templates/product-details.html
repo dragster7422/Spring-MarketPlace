@@ -12,16 +12,26 @@
 <nav class="navbar navbar-dark bg-dark">
     <div class="container d-flex justify-content-between align-items-center">
         <a class="navbar-brand" th:href="@{/}">MarketPlace</a>
+        <div class="d-flex gap-3 align-items-center">
+            <a class="btn btn-primary" th:href="@{/product/add}">Create Product</a>
+            <a class="nav-link-profile" th:href="@{/profile}" title="Profile">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+                </svg>
+            </a>
+        </div>
     </div>
 </nav>
 
 <!-- Content -->
 <div class="container my-5">
+    <!-- Product Container -->
     <div class="product-container">
         <!-- Buttons -->
         <div class="d-flex justify-content-between mb-3">
             <a th:href="@{/}" class="btn-back">Back</a>
-            <a th:href="@{/product/{id}/edit(id=${product.id})}" class="btn-back">Edit</a>
+
+            <a th:if="${isOwner}" th:href="@{/product/{id}/edit(id=${product.id})}" class="btn-back">Edit</a>
         </div>
 
         <!-- Product Title -->
@@ -72,11 +82,6 @@
                          th:classappend="${iterStat.index == 0} ? 'active'"
                          th:onclick="'setCarouselSlide(' + ${iterStat.index} + ')'">
                 </div>
-                <!-- Fallback for no images -->
-                <img class="product-detail-image"
-                     th:if="${#lists.isEmpty(product.sortedImages)}"
-                     src="/images/placeholder.jpg"
-                     th:alt="'No image for ' + ${product.title}">
             </div>
 
             <!-- Product Details -->
@@ -84,10 +89,35 @@
                 <p class="product-details-price"
                    th:text="${#numbers.formatDecimal(product.price, 1, 'POINT', 0, 'POINT')} + ' ₴'">0 ₴</p>
                 <p class="product-description" th:text="${product.description}">Description...</p>
-                <p class="text-muted small" th:text="'Created on: ' + ${#temporals.format(product.dateOfCreated, 'dd.MM.yyyy')}">Created on: DD.MM.YYYY</p>
-                <a href="#" class="btn btn-buy">Buy</a>
+
+                <!-- Product metadata -->
+                <div class="mb-3">
+                    <p class="text-muted small mb-0" th:text="'Created: ' + ${#temporals.format(product.dateOfCreated, 'dd.MM.yyyy')}">Created: DD.MM.YYYY</p>
+                </div>
+
+                <!-- Buy button (hidden for owner) -->
+                <a th:if="${!isOwner}" href="#" class="btn btn-buy">Buy</a>
             </div>
         </div>
+    </div>
+
+    <!-- Seller Block -->
+    <div class="product-container mt-4">
+        <h5 class="mb-3">Seller Information</h5>
+        <a th:href="@{'/seller/' + ${product.owner.id}}" class="text-decoration-none">
+            <div class="seller-block d-flex align-items-center gap-3 p-3 border rounded">
+                <div class="seller-avatar bg-light rounded-circle d-flex align-items-center justify-content-center"
+                     style="width: 60px; height: 60px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="text-secondary" viewBox="0 0 16 16">
+                        <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="mb-1 fw-bold text-dark fs-5" th:text="${product.owner.username}">Username</p>
+                    <p class="mb-0 text-muted">View all products from this seller →</p>
+                </div>
+            </div>
+        </a>
     </div>
 </div>
 

@@ -71,6 +71,32 @@ body.main-page {
     text-decoration: none;
 }
 
+/* Profile link in navigation */
+.nav-link-profile {
+    color: var(--white);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1rem;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+}
+
+.nav-link-profile:hover {
+    color: var(--secondary-color);
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-link-profile svg {
+    width: 24px;
+    height: 24px;
+}
+
 /* --------------------------------------------
    BUTTONS
    -------------------------------------------- */
@@ -86,6 +112,21 @@ body.main-page {
 .btn-primary:hover {
     background-color: var(--primary-hover);
     border-color: var(--primary-hover);
+}
+
+/* My Products Button (on profile page) */
+.btn-my-products {
+    font-weight: 600;
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--white);
+    transition: all var(--transition-fast);
+}
+
+.btn-my-products:hover {
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
+    color: var(--white);
 }
 
 /* Search Button */
@@ -317,6 +358,133 @@ body.main-page {
 }
 
 /* --------------------------------------------
+   HORIZONTAL PRODUCT CARDS (Profile/Seller Pages)
+   -------------------------------------------- */
+.product-card-horizontal {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+    background: var(--white);
+    align-items: stretch;
+}
+
+.product-card-horizontal:hover {
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.product-horizontal-image {
+    width: 150px;
+    height: 150px;
+    flex-shrink: 0;
+    background-color: var(--bg-light);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 5px;
+}
+
+.product-horizontal-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.product-horizontal-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.product-horizontal-description {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-height: 1.4;
+}
+
+.product-horizontal-price {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.product-horizontal-actions {
+    width: 100px;
+    flex-shrink: 0;
+}
+
+.product-horizontal-actions .btn {
+    font-size: 0.875rem;
+    padding: 0.4rem 0.8rem;
+}
+
+/* --------------------------------------------
+   SELLER BLOCK
+   -------------------------------------------- */
+.seller-block {
+    transition: all var(--transition-fast);
+    cursor: pointer;
+}
+
+.seller-block:hover {
+    background-color: var(--bg-light);
+    border-color: var(--primary-color) !important;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.seller-avatar {
+    flex-shrink: 0;
+}
+
+/* Settings Icon Button */
+.btn-icon-settings {
+    font-weight: 600;
+    border: 2px solid var(--primary-color);
+    background-color: transparent;
+    color: var(--primary-color);
+    padding: 0.4rem 0.8rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.2;
+    transition: all var(--transition-fast);
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+}
+
+.btn-icon-settings:hover {
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+
+.btn-icon-settings svg {
+    transition: transform var(--transition-normal);
+}
+
+.btn-icon-settings:hover svg {
+    transform: rotate(90deg);
+}
+
+/* --------------------------------------------
    IMAGE PREVIEW (Product Add Form)
    -------------------------------------------- */
 .image-preview-container {
@@ -423,6 +591,25 @@ body.main-page {
     .btn-back {
         padding: var(--spacing-sm) var(--spacing-md);
         font-size: 0.9rem;
+    }
+
+    /* Horizontal Product Cards */
+    .product-card-horizontal {
+        flex-direction: column !important;
+    }
+
+    .product-horizontal-image {
+        width: 100% !important;
+        height: 200px !important;
+    }
+
+    .product-horizontal-actions {
+        flex-direction: row !important;
+        width: 100% !important;
+    }
+
+    .product-horizontal-actions .btn {
+        flex: 1;
     }
 }
 
