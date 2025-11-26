@@ -7,7 +7,6 @@ import com.example.services.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -42,7 +41,7 @@ public class ProductController {
                              @RequestParam(value = "additionalImages", required = false) List<MultipartFile> additionalImages,
                              @Valid @ModelAttribute Product product,
                              BindingResult bindingResult,
-                             @AuthenticationPrincipal UserDetails userDetails,
+                             @AuthenticationPrincipal User currentUser,
                              Model model) {
 
         boolean isPreviewImageMissing = false;
@@ -55,8 +54,6 @@ public class ProductController {
             return "product-add";
         }
 
-        // Get current User
-        User currentUser = userService.getByUsername(userDetails.getUsername());
         if(currentUser == null) {
             return "redirect:/logout";
         }
@@ -78,7 +75,7 @@ public class ProductController {
     // Details
     @GetMapping("/product/{id}")
     public String productDetails(@PathVariable Long id,
-                                 @AuthenticationPrincipal UserDetails userDetails,
+                                 @AuthenticationPrincipal User currentUser,
                                  Model model) {
         Product product = productService.getById(id);
         if(product == null) {
@@ -87,8 +84,7 @@ public class ProductController {
 
         // Check if the current user is the owner
         boolean isOwner = false;
-        if(userDetails != null) {
-            User currentUser = userService.getByUsername(userDetails.getUsername());
+        if(currentUser != null) {
             isOwner = productService.isOwner(product, currentUser);
         }
 
@@ -100,7 +96,7 @@ public class ProductController {
     // Edit
     @GetMapping("/product/{id}/edit")
     public String productEdit(@PathVariable Long id,
-                              @AuthenticationPrincipal UserDetails userDetails,
+                              @AuthenticationPrincipal User currentUser,
                               Model model) {
         Product product = productService.getById(id);
         if(product == null) {
@@ -108,7 +104,6 @@ public class ProductController {
         }
 
         // Checking access rights
-        User currentUser = userService.getByUsername(userDetails.getUsername());
         if(!productService.isOwner(product, currentUser)) {
             model.addAttribute("errorAccess", "You don't have permission to edit this product");
             return "redirect:/product/" + id;
@@ -125,7 +120,7 @@ public class ProductController {
                               @RequestParam(value = "removeImageIds", required = false) List<Long> removeImageIds,
                               @Valid @ModelAttribute Product product,
                               BindingResult bindingResult,
-                              @AuthenticationPrincipal UserDetails userDetails,
+                              @AuthenticationPrincipal User currentUser,
                               Model model) {
 
         // Checking access rights
@@ -134,7 +129,6 @@ public class ProductController {
             return "redirect:/";
         }
 
-        User currentUser = userService.getByUsername(userDetails.getUsername());
         if(!productService.isOwner(dbProduct, currentUser)) {
             return "redirect:/product/" + id;
         }
@@ -155,7 +149,7 @@ public class ProductController {
     // Delete
     @PostMapping("/product/{id}/delete")
     public String productDelete(@PathVariable Long id,
-                                @AuthenticationPrincipal UserDetails userDetails) {
+                                @AuthenticationPrincipal User currentUser) {
 
         // Checking access rights
         Product product = productService.getById(id);
@@ -163,7 +157,6 @@ public class ProductController {
             return "redirect:/";
         }
 
-        User currentUser = userService.getByUsername(userDetails.getUsername());
         if(!productService.isOwner(product, currentUser)) {
             return "redirect:/product/" + id;
         }
