@@ -1,14 +1,16 @@
 package com.example.services;
 
 import com.example.models.Product;
-import com.example.models.ProductImage;
 import com.example.models.User;
+import com.example.models.enums.Role;
 import com.example.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -17,6 +19,10 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final ProductImageService productImageService;
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
 
     public boolean registerUser(User user) {
         if(userRepository.existsByUsername(user.getUsername())) {
@@ -30,6 +36,8 @@ public class UserService {
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.addRole(Role.ROLE_USER);
+
         userRepository.save(user);
         log.info("User registered successfully: {}", user.getUsername());
         return true;
@@ -96,5 +104,52 @@ public class UserService {
 
         userRepository.deleteById(id);
         log.info("User deleted: {}", user.getUsername());
+    }
+
+
+    // ========================================
+    // Admin methods
+    // ========================================
+
+    @Transactional
+    public boolean toggleUserActive(Long userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            log.error("User with id {} not found", userId);
+            return false;
+        }
+
+        user.setActive(!user.isActive());
+        userRepository.save(user);
+        log.info("User {} active status changed to: {}", user.getUsername(), user.isActive());
+        return true;
+    }
+
+    @Transactional
+    public boolean addRoleToUser(Long userId, Role role) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            log.error("User with id {} not found", userId);
+            return false;
+        }
+
+        user.addRole(role);
+        userRepository.save(user);
+        log.info("Added role {} to user: {}", role, user.getUsername());
+        return true;
+    }
+
+    @Transactional
+    public boolean removeRoleFromUser(Long userId, Role role) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            log.error("User with id {} not found", userId);
+            return false;
+        }
+
+        user.removeRole(role);
+        userRepository.save(user);
+        log.info("Removed role {} from user: {}", role, user.getUsername());
+        return true;
     }
 }

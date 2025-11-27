@@ -9,7 +9,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
@@ -44,6 +43,12 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private boolean active;
 
+    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    private Set<Role> roles = new HashSet<>();
+
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Product> products = new ArrayList<>();
 
@@ -56,11 +61,14 @@ public class User implements UserDetails {
         createdAt = LocalDateTime.now();
     }
 
+
+    // ========================================
+    // UserDetails Implementation
+    // ========================================
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-        return authorities;
+        return roles;
     }
 
     @Override
@@ -91,5 +99,30 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return active;
+    }
+
+
+    // ========================================
+    // Helper methods for roles
+    // ========================================
+
+    public boolean hasRole(Role role) {
+        return roles.contains(role);
+    }
+
+    public boolean isAdmin() {
+        return hasRole(Role.ROLE_ADMIN);
+    }
+
+    public boolean isUser() {
+        return hasRole(Role.ROLE_USER);
+    }
+
+    public void addRole(Role role) {
+        this.roles.add(role);
+    }
+
+    public void removeRole(Role role) {
+        this.roles.remove(role);
     }
 }

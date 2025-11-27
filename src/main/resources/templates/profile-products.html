@@ -36,11 +36,10 @@
 
         <!-- Empty State -->
         <div th:if="${#lists.isEmpty(products)}" class="text-center py-5">
-            <!-- Back Button -->
-            <div class="mb-4">
-                <a th:href="@{/profile}" class="btn-back">Back to Profile</a>
-            </div>
             <div class="product-container">
+                <!-- Back button -->
+                <a th:href="@{/profile}" class="btn-back">Back to Profile</a>
+
                 <h3 class="mb-3">You haven't created any products yet</h3>
                 <p class="text-muted mb-4">Start selling by creating your first product!</p>
                 <a th:href="@{/product/add}" class="btn btn-primary btn-lg">Create First Product</a>

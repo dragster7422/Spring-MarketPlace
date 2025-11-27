@@ -12,6 +12,7 @@
 <nav class="navbar navbar-dark bg-dark">
     <div class="container d-flex justify-content-between align-items-center">
         <a class="navbar-brand" th:href="@{/}">MarketPlace</a>
+
         <div class="d-flex gap-3 align-items-center">
             <a class="btn btn-primary" th:href="@{/product/add}">Create Product</a>
             <a class="nav-link-profile" th:href="@{/profile}" title="Profile">
@@ -60,6 +61,11 @@
 
         <div class="d-grid gap-3 mb-4">
             <a th:href="@{/profile/products}" class="btn btn-my-products">My Products</a>
+
+            <!-- Admin Dashboard link (only for admins) -->
+            <a th:if="${user.isAdmin()}" th:href="@{/profile/admin/dashboard}" class="btn btn-danger">
+                Admin Dashboard
+            </a>
         </div>
 
         <div class="pt-4" style="border-top: 3px solid #dee2e6;">
