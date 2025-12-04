@@ -25,6 +25,7 @@ import java.util.UUID;
 public class ProductService {
     private final ProductRepository productRepository;
     private final ProductImageService productImageService;
+    private final ProductSearchService searchService;
 
     public List<Product> getProducts() {
         return productRepository.findAll();
@@ -36,6 +37,7 @@ public class ProductService {
 
     public void save(Product product) {
         productRepository.save(product);
+        searchService.indexProduct(product);
     }
 
     public List<Product> getProductsByOwnerId(Long ownerId) {
@@ -91,6 +93,9 @@ public class ProductService {
         product.setOwner(owner);
         productRepository.save(product);
 
+        // Index product in Elasticsearch
+        searchService.indexProduct(product);
+
         return true;
     }
 
@@ -124,6 +129,9 @@ public class ProductService {
         }
 
         productRepository.deleteById(id);
+
+        // Delete from Elasticsearch index
+        searchService.deleteProductFromIndex(id);
     }
 
     @Transactional
@@ -183,6 +191,14 @@ public class ProductService {
         dbProduct.addImages(newImages);
         productRepository.save(dbProduct);
 
+        // Update in Elasticsearch index
+        searchService.indexProduct(dbProduct);
+
         return true;
+    }
+
+    // Search method
+    public List<Product> searchProducts(String query) {
+        return searchService.searchProducts(query);
     }
 }
