@@ -23,8 +23,18 @@ public class ProductController {
     private final UserService userService;
 
     @GetMapping("/")
-    public String products(Model model) {
-        model.addAttribute("products", productService.getProducts());
+    public String products(@RequestParam(value = "query", required = false) String query,
+                           Model model) {
+        List<Product> products;
+
+        if (query != null && !query.trim().isEmpty()) {
+            products = productService.searchProducts(query);
+            model.addAttribute("searchQuery", query);
+        } else {
+            products = productService.getProducts();
+        }
+
+        model.addAttribute("products", products);
         return "products";
     }
 
