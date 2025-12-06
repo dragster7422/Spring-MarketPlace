@@ -152,4 +152,8 @@ public class UserService {
         log.info("Removed role {} from user: {}", role, user.getUsername());
         return true;
     }
+
+    public List<User> getByUsernameOrEmail(String query) {
+        return userRepository.findByUsernameContainingIgnoreCaseOrEmailContainingIgnoreCase(query, query);
+    }
 }
