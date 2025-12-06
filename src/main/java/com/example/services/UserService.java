@@ -7,6 +7,10 @@ import com.example.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,8 +24,19 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final ProductImageService productImageService;
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public Page<User> getUsersPage(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+        return userRepository.findAll(pageable);
+    }
+
+    public Page<User> getByUsernameOrEmailPage(String query, int page, int size) {
+        if (query == null || query.trim().isEmpty()) {
+            return getUsersPage(page, size);
+        }
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+        return userRepository.findByUsernameContainingIgnoreCaseOrEmailContainingIgnoreCase(
+                query, query, pageable
+        );
     }
 
     public boolean registerUser(User user) {
@@ -151,9 +166,5 @@ public class UserService {
         userRepository.save(user);
         log.info("Removed role {} from user: {}", role, user.getUsername());
         return true;
-    }
-
-    public List<User> getByUsernameOrEmail(String query) {
-        return userRepository.findByUsernameContainingIgnoreCaseOrEmailContainingIgnoreCase(query, query);
     }
 }

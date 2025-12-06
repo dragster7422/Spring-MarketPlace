@@ -69,10 +69,10 @@
             <form th:action="@{/profile/admin/dashboard}" method="get" class="row g-3 align-items-end">
                 <div class="col-md-10">
                     <label for="searchQuery" class="form-label fw-semibold">Search Users</label>
-                    <input type="text" 
-                           class="form-control" 
-                           id="searchQuery" 
-                           name="query" 
+                    <input type="text"
+                           class="form-control"
+                           id="searchQuery"
+                           name="query"
                            th:value="${searchQuery}"
                            placeholder="Search by username or email...">
                 </div>
@@ -84,8 +84,8 @@
                         Search
                     </button>
                     <!-- Clear Button (only show if there's a search query) -->
-                    <a th:if="${searchQuery != null and !searchQuery.isEmpty()}" 
-                       th:href="@{/profile/admin/dashboard}" 
+                    <a th:if="${searchQuery != null and !searchQuery.isEmpty()}"
+                       th:href="@{/profile/admin/dashboard}"
                        class="btn btn-outline-secondary">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
                             <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
@@ -95,18 +95,25 @@
             </form>
         </div>
 
-        <!-- Search Results Info -->
-        <div class="mb-4">
-            <h5 class="mb-2">
+        <!-- Search Results Info & Pagination Info -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="mb-0">
                 <span th:if="${searchQuery != null and !searchQuery.isEmpty()}">
-                    Search Results for "<span th:text="${searchQuery}"></span>": 
-                    <span th:text="${#lists.size(users)}">0</span>
-                    <span th:text="${#lists.size(users) == 1} ? 'user' : 'users'">users</span>
+                    Search Results for "<span th:text="${searchQuery}"></span>":
+                    <span th:text="${totalItems}">0</span>
+                    <span th:text="${totalItems == 1} ? 'user' : 'users'">users</span>
                 </span>
                 <span th:unless="${searchQuery != null and !searchQuery.isEmpty()}">
-                    Total Users: <span th:text="${#lists.size(users)}">0</span>
+                    Total Users: <span th:text="${totalItems}">0</span>
                 </span>
             </h5>
+
+            <!-- Showing X-Y of Z users -->
+            <div th:if="${totalItems > 0}" class="text-muted">
+                Showing
+                <span th:text="${currentPage * 20 + 1}">1</span>-<span th:text="${currentPage * 20 + #lists.size(users)}">20</span>
+                of <span th:text="${totalItems}">0</span>
+            </div>
         </div>
 
         <!-- Users Table -->
@@ -212,6 +219,38 @@
                 The system has no registered users.
             </p>
         </div>
+
+        <!-- Pagination -->
+        <nav th:if="${totalPages > 1}" aria-label="User pagination" class="mt-4">
+            <ul class="pagination justify-content-center">
+                <!-- Previous Button -->
+                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{/profile/admin/dashboard(page=${currentPage - 1}, query=${searchQuery})}"
+                       aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+
+                <!-- Page Numbers -->
+                <li class="page-item"
+                    th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
+                    th:classappend="${pageNum == currentPage} ? 'active'">
+                    <a class="page-link"
+                       th:href="@{/profile/admin/dashboard(page=${pageNum}, query=${searchQuery})}"
+                       th:text="${pageNum + 1}">1</a>
+                </li>
+
+                <!-- Next Button -->
+                <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{/profile/admin/dashboard(page=${currentPage + 1}, query=${searchQuery})}"
+                       aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
     </div>
 </div>
 

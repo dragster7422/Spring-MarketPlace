@@ -4,6 +4,7 @@ import com.example.models.User;
 import com.example.models.enums.Role;
 import com.example.services.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -21,19 +22,25 @@ public class AdminController {
 
     @GetMapping("")
     public String adminDashboard(@AuthenticationPrincipal User currentAdmin,
-                                 @RequestParam(name = "query", required = false) String query,
+                                 @RequestParam(value = "query", required = false) String query,
+                                 @RequestParam(value = "page", defaultValue = "0") int page,
                                  Model model) {
+        int pageSize = 20; // 20 users per page
+        Page<User> usersPage;
 
-        List<User> users;
         if (query != null && !query.trim().isEmpty()) {
-            users = userService.getByUsernameOrEmail(query);
+            usersPage = userService.getByUsernameOrEmailPage(query, page, pageSize);
             model.addAttribute("searchQuery", query);
         } else {
-            users = userService.getAllUsers();
+            usersPage = userService.getUsersPage(page, pageSize);
         }
 
-        model.addAttribute("users", users);
+        model.addAttribute("users", usersPage.getContent());
+        model.addAttribute("currentPage", usersPage.getNumber());
+        model.addAttribute("totalPages", usersPage.getTotalPages());
+        model.addAttribute("totalItems", usersPage.getTotalElements());
         model.addAttribute("currentAdmin", currentAdmin);
+
         return "admin-dashboard";
     }
 
