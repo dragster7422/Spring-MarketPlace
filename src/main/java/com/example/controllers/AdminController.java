@@ -10,6 +10,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/profile/admin/dashboard")
 @PreAuthorize("hasRole('ADMIN')")
@@ -19,8 +21,18 @@ public class AdminController {
 
     @GetMapping("")
     public String adminDashboard(@AuthenticationPrincipal User currentAdmin,
+                                 @RequestParam(name = "query", required = false) String query,
                                  Model model) {
-        model.addAttribute("users", userService.getAllUsers());
+
+        List<User> users;
+        if (query != null && !query.trim().isEmpty()) {
+            users = userService.getByUsernameOrEmail(query);
+            model.addAttribute("searchQuery", query);
+        } else {
+            users = userService.getAllUsers();
+        }
+
+        model.addAttribute("users", users);
         model.addAttribute("currentAdmin", currentAdmin);
         return "admin-dashboard";
     }
