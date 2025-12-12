@@ -6,6 +6,7 @@ import com.example.repositories.ProductRepository;
 import com.example.repositories.ProductSearchRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -67,26 +68,33 @@ public class ProductSearchService {
     /**
      * Search products by query (searches in title and description)
      */
-    public List<Product> searchProducts(String query) {
+    public Page<Product> searchProducts(String query, int page, int size) {
         if (query == null || query.trim().isEmpty()) {
-            return productRepository.findAll();
+            Pageable pageable = PageRequest.of(page, size, Sort.by("dateOfCreated").descending());
+            return productRepository.findAll(pageable);
         }
 
         try {
-            // Search in Elasticsearch
-            List<ProductDocument> documents = searchRepository
-                    .findByTitleContainingOrDescriptionContaining(query, query);
+            Pageable pageable = PageRequest.of(page, size);
 
-            // Get full Product entities from database
-            List<Long> productIds = documents.stream()
+            // Search in Elasticsearch
+            Page<ProductDocument> documentsPage = searchRepository
+                    .findByTitleContainingOrDescriptionContaining(query, query, pageable);
+
+            // Get full Product entities from DB
+            List<Long> productIds = documentsPage.getContent().stream()
                     .map(ProductDocument::getId)
                     .collect(Collectors.toList());
 
-            return productRepository.findAllById(productIds);
+            List<Product> products = productRepository.findAllById(productIds);
+
+            // Return as Page
+            return new PageImpl<>(products, pageable, documentsPage.getTotalElements());
         } catch (Exception e) {
             log.error("Error searching products with query: {}", query, e);
             // Fallback to database search if Elasticsearch fails
-            return productRepository.findAll();
+            Pageable pageable = PageRequest.of(page, size, Sort.by("dateOfCreated").descending());
+            return productRepository.findAll(pageable);
         }
     }
 }

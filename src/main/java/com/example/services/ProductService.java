@@ -7,6 +7,10 @@ import com.example.repositories.ProductRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,8 +31,9 @@ public class ProductService {
     private final ProductImageService productImageService;
     private final ProductSearchService searchService;
 
-    public List<Product> getProducts() {
-        return productRepository.findAll();
+    public Page<Product> getProducts(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("dateOfCreated").descending());
+        return productRepository.findAll(pageable);
     }
 
     public Product getById(Long id) {
@@ -198,7 +203,7 @@ public class ProductService {
     }
 
     // Search method
-    public List<Product> searchProducts(String query) {
-        return searchService.searchProducts(query);
+    public Page<Product> searchProducts(String query, int page, int size) {
+        return searchService.searchProducts(query, page, size);
     }
 }

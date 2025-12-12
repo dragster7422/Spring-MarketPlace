@@ -40,6 +40,10 @@ public class ProductImage {
     }
 
     public String getImageUrl() {
+        if (imageDirectory.startsWith("http://") || imageDirectory.startsWith("https://")) {
+            return imageDirectory;
+        }
+
         return "/" + imageDirectory;
     }
 }
