@@ -6,6 +6,7 @@ import com.example.services.ProductService;
 import com.example.services.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,17 +25,23 @@ public class ProductController {
 
     @GetMapping("/")
     public String products(@RequestParam(value = "query", required = false) String query,
+                           @RequestParam(value = "page", defaultValue = "0") int page,
                            Model model) {
-        List<Product> products;
+        int pageSize = 20;
+        Page<Product> productsPage;
 
         if (query != null && !query.trim().isEmpty()) {
-            products = productService.searchProducts(query);
+            productsPage = productService.searchProducts(query, page, pageSize);
             model.addAttribute("searchQuery", query);
         } else {
-            products = productService.getProducts();
+            productsPage = productService.getProducts(page, pageSize);
         }
 
-        model.addAttribute("products", products);
+        model.addAttribute("products", productsPage.getContent());
+        model.addAttribute("currentPage", productsPage.getNumber());
+        model.addAttribute("totalPages", productsPage.getTotalPages());
+        model.addAttribute("totalItems", productsPage.getTotalElements());
+
         return "products";
     }
 

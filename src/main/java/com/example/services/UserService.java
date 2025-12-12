@@ -24,6 +24,10 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final ProductImageService productImageService;
 
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
     public Page<User> getUsersPage(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
         return userRepository.findAll(pageable);

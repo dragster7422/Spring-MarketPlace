@@ -14,7 +14,12 @@
         <a class="navbar-brand" th:href="@{/}">MarketPlace</a>
 
         <form class="d-flex mx-auto" th:action="@{/}" method="get" style="max-width: 600px; width: 100%;">
-            <input class="form-control me-2" type="search" name="query" placeholder="Search products..." aria-label="Search">
+            <input class="form-control me-2"
+                   type="search"
+                   name="query"
+                   th:value="${searchQuery}"
+                   placeholder="Search products..."
+                   aria-label="Search">
             <button class="btn btn-search" type="submit">Search</button>
         </form>
 
@@ -38,14 +43,51 @@
 
 <section class="py-5">
     <div class="container">
+        <!-- Search Results Info & Product Count -->
+        <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <span th:if="${searchQuery != null and !searchQuery.isEmpty()}">
+                        Search Results for "<span th:text="${searchQuery}"></span>":
+                        <span th:text="${totalItems}">0</span>
+                        <span th:text="${totalItems == 1} ? 'product' : 'products'">products</span>
+                    </span>
+                    <span th:unless="${searchQuery != null and !searchQuery.isEmpty()}">
+                        All Products: <span th:text="${totalItems}">0</span>
+                    </span>
+                </h5>
+
+                <!-- Clear search button -->
+                <a th:if="${searchQuery != null and !searchQuery.isEmpty()}"
+                   th:href="@{/}"
+                   class="btn btn-sm btn-outline-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg me-1" viewBox="0 0 16 16">
+                        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+                    </svg>
+                    Clear Search
+                </a>
+            </div>
+        </div>
+
         <!-- Empty state message -->
         <div th:if="${#lists.isEmpty(products)}" class="text-center py-5">
-            <h3 class="mb-3">No products available</h3>
-            <p class="text-muted">Check back later for new listings</p>
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-box-seam text-muted mb-3" viewBox="0 0 16 16">
+                <path d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5l2.404.961L10.404 2zm3.564 1.426L5.596 5 8 5.961 14.154 3.5zm3.25 1.7-6.5 2.6v7.922l6.5-2.6V4.24zM7.5 14.762V6.838L1 4.239v7.923zM7.443.184a1.5 1.5 0 0 1 1.114 0l7.129 2.852A.5.5 0 0 1 16 3.5v8.662a1 1 0 0 1-.629.928l-7.185 2.874a.5.5 0 0 1-.372 0L.63 13.09a1 1 0 0 1-.63-.928V3.5a.5.5 0 0 1 .314-.464z"/>
+            </svg>
+            <h3 class="mb-3">
+                <span th:if="${searchQuery != null and !searchQuery.isEmpty()}">No products found</span>
+                <span th:unless="${searchQuery != null and !searchQuery.isEmpty()}">No products available</span>
+            </h3>
+            <p class="text-muted" th:if="${searchQuery != null and !searchQuery.isEmpty()}">
+                Try adjusting your search query or browse all products
+            </p>
+            <p class="text-muted" th:unless="${searchQuery != null and !searchQuery.isEmpty()}">
+                Check back later for new listings
+            </p>
         </div>
 
         <!-- Products grid -->
-        <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+        <div th:if="${!#lists.isEmpty(products)}" class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
             <div class="col" th:each="product : ${products}">
                 <a th:href="@{'/product/' + ${product.id}}" class="text-decoration-none text-dark">
                     <div class="card h-100 shadow-sm product-card">
@@ -65,6 +107,38 @@
                 </a>
             </div>
         </div>
+
+        <!-- Pagination -->
+        <nav th:if="${totalPages > 1}" aria-label="Product pagination" class="mt-5">
+            <ul class="pagination justify-content-center">
+                <!-- Previous Button -->
+                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{/(page=${currentPage - 1}, query=${searchQuery})}"
+                       aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+
+                <!-- Page Numbers -->
+                <li class="page-item"
+                    th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
+                    th:classappend="${pageNum == currentPage} ? 'active'">
+                    <a class="page-link"
+                       th:href="@{/(page=${pageNum}, query=${searchQuery})}"
+                       th:text="${pageNum + 1}">1</a>
+                </li>
+
+                <!-- Next Button -->
+                <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{/(page=${currentPage + 1}, query=${searchQuery})}"
+                       aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
     </div>
 </section>
 
