@@ -23,18 +23,19 @@ public class ProductController {
     private final ProductService productService;
     private final UserService userService;
 
+    private final static int PAGE_SIZE = 16;
+
     @GetMapping("/")
     public String products(@RequestParam(value = "query", required = false) String query,
                            @RequestParam(value = "page", defaultValue = "0") int page,
                            Model model) {
-        int pageSize = 20;
         Page<Product> productsPage;
 
         if (query != null && !query.trim().isEmpty()) {
-            productsPage = productService.searchProducts(query, page, pageSize);
+            productsPage = productService.searchProducts(query, page, PAGE_SIZE);
             model.addAttribute("searchQuery", query);
         } else {
-            productsPage = productService.getProducts(page, pageSize);
+            productsPage = productService.getProducts(page, PAGE_SIZE);
         }
 
         model.addAttribute("products", productsPage.getContent());

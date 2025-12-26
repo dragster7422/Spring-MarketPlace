@@ -5,9 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -16,9 +14,10 @@ import java.util.*;
 
 @Entity
 @Table(name = "users")
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class User implements UserDetails {
 
     @Id
@@ -124,5 +123,19 @@ public class User implements UserDetails {
 
     public void removeRole(Role role) {
         this.roles.remove(role);
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if(this == obj) return true;
+        if(obj == null || getClass() != obj.getClass()) return false;
+        User user = (User) obj;
+        return id != null && id.equals(user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }
