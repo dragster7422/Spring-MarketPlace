@@ -35,6 +35,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(SecurityConfig.class)
 class ProductControllerTest {
 
+    private final static int PAGE_SIZE = 16;
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -88,7 +90,7 @@ class ProductControllerTest {
                 .andExpect(model().attributeExists("currentPage"))
                 .andExpect(model().attributeExists("totalPages"));
 
-        verify(productService, times(1)).getProducts(0, 20);
+        verify(productService, times(1)).getProducts(0, PAGE_SIZE);
     }
 
     @Test
@@ -104,7 +106,7 @@ class ProductControllerTest {
                 .andExpect(view().name("products"))
                 .andExpect(model().attribute("searchQuery", "test"));
 
-        verify(productService, times(1)).searchProducts("test", 0, 20);
+        verify(productService, times(1)).searchProducts("test", 0, PAGE_SIZE);
     }
 
     @Test
