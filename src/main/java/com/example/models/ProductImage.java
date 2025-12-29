@@ -23,7 +23,7 @@ public class ProductImage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(length = 500)
     private String imageDirectory;
 
     @ManyToOne(fetch = FetchType.LAZY)
