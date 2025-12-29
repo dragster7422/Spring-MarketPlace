@@ -24,9 +24,9 @@ public class Product {
     @NotBlank(message = "The title cannot be empty")
     private String title;
 
-    @Column
+    @Column(length = 600)
     @NotBlank(message = "The description cannot be empty")
-    @Size(min = 20, message = "The description must be more than 20 characters")
+    @Size(min = 20, max = 600, message = "The description must contain at least 20 and no more than 600 characters.")
     private String description;
 
     @Column(precision = 10, scale = 2)
