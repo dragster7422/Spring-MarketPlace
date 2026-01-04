@@ -26,6 +26,7 @@ A full-featured marketplace application built with Java and Spring Boot, allowin
 ### Product Management
 - Create, read, update, and delete products
 - Multiple image uploads per product (preview + additional images)
+- Image validation and magic byte checking
 - Product search with Elasticsearch integration
 - Pagination for product listings
 - Price management with decimal precision

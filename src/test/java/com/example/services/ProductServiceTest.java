@@ -4,6 +4,8 @@ import com.example.models.Product;
 import com.example.models.ProductImage;
 import com.example.models.User;
 import com.example.repositories.ProductRepository;
+import com.example.services.ProductService.SaveResult;
+import com.example.services.ImageValidationService.ValidationResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,6 +39,9 @@ class ProductServiceTest {
 
     @Mock
     private ProductSearchService searchService;
+
+    @Mock
+    private ImageValidationService imageValidationService;
 
     @InjectMocks
     private ProductService productService;
@@ -228,7 +233,7 @@ class ProductServiceTest {
     }
 
     @Test
-    void updateProduct_WithValidData_ShouldReturnTrue() {
+    void updateProduct_WithValidData_ShouldReturnSuccess() {
         // Arrange
         Product updatedProduct = new Product();
         updatedProduct.setTitle("Updated Title");
@@ -236,14 +241,15 @@ class ProductServiceTest {
         updatedProduct.setPrice(new BigDecimal("199.99"));
 
         when(productRepository.findById(anyLong())).thenReturn(Optional.of(testProduct));
+        when(imageValidationService.validateAdditionalImages(any())).thenReturn(ValidationResult.success());
         when(productRepository.save(any(Product.class))).thenReturn(testProduct);
         doNothing().when(searchService).indexProduct(any(Product.class));
 
         // Act
-        boolean result = productService.updateProduct(1L, null, null, null, updatedProduct);
+        SaveResult result = productService.updateProduct(1L, null, null, null, updatedProduct);
 
         // Assert
-        assertTrue(result);
+        assertTrue(result.isSuccess());
         assertEquals("Updated Title", testProduct.getTitle());
         assertEquals("Updated Description that is long enough", testProduct.getDescription());
         assertEquals(new BigDecimal("199.99"), testProduct.getPrice());
@@ -253,16 +259,17 @@ class ProductServiceTest {
     }
 
     @Test
-    void updateProduct_WhenProductNotFound_ShouldReturnFalse() {
+    void updateProduct_WhenProductNotFound_ShouldReturnError() {
         // Arrange
         Product updatedProduct = new Product();
         when(productRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         // Act
-        boolean result = productService.updateProduct(999L, null, null, null, updatedProduct);
+        SaveResult result = productService.updateProduct(999L, null, null, null, updatedProduct);
 
         // Assert
-        assertFalse(result);
+        assertFalse(result.isSuccess());
+        assertEquals("Product not found", result.getErrorMessage());
         verify(productRepository, times(1)).findById(999L);
         verify(productRepository, never()).save(any(Product.class));
     }
@@ -282,6 +289,7 @@ class ProductServiceTest {
         updatedProduct.setPrice(new BigDecimal("199.99"));
 
         when(productRepository.findById(anyLong())).thenReturn(Optional.of(testProduct));
+        when(imageValidationService.validateAdditionalImages(any())).thenReturn(ValidationResult.success());
         when(productImageService.getImageById(anyLong())).thenReturn(image1);
         doNothing().when(productImageService).deleteImageFromDisk(any(ProductImage.class));
         when(productRepository.save(any(Product.class))).thenReturn(testProduct);
@@ -290,61 +298,77 @@ class ProductServiceTest {
         List<Long> removeImageIds = List.of(1L);
 
         // Act
-        boolean result = productService.updateProduct(1L, null, null, removeImageIds, updatedProduct);
+        SaveResult result = productService.updateProduct(1L, null, null, removeImageIds, updatedProduct);
 
         // Assert
-        assertTrue(result);
+        assertTrue(result.isSuccess());
         verify(productImageService, times(1)).getImageById(1L);
         verify(productImageService, times(1)).deleteImageFromDisk(image1);
         verify(productRepository, times(1)).save(testProduct);
     }
 
     @Test
-    void saveProductWithImages_WithNullPreviewImage_ShouldReturnFalse() throws Exception {
-        // Act
-        boolean result = productService.saveProductWithImages(null, null, testProduct, testUser);
-
-        // Assert
-        assertFalse(result);
-        verify(productRepository, never()).save(any(Product.class));
-    }
-
-    @Test
-    void saveProductWithImages_WithEmptyPreviewImage_ShouldReturnFalse() throws Exception {
-        // Arrange
-        MultipartFile emptyFile = new MockMultipartFile("file", new byte[0]);
-
-        // Act
-        boolean result = productService.saveProductWithImages(emptyFile, null, testProduct, testUser);
-
-        // Assert
-        assertFalse(result);
-        verify(productRepository, never()).save(any(Product.class));
-    }
-
-    @Test
-    void saveProductWithImages_WithNullProduct_ShouldReturnFalse() throws Exception {
+    void saveProductWithImages_WithNullProduct_ShouldReturnError() {
         // Arrange
         MultipartFile file = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test".getBytes());
 
         // Act
-        boolean result = productService.saveProductWithImages(file, null, null, testUser);
+        SaveResult result = productService.saveProductWithImages(file, null, null, testUser);
 
         // Assert
-        assertFalse(result);
+        assertFalse(result.isSuccess());
+        assertEquals("Invalid product or owner data", result.getErrorMessage());
         verify(productRepository, never()).save(any(Product.class));
     }
 
     @Test
-    void saveProductWithImages_WithNullOwner_ShouldReturnFalse() throws Exception {
+    void saveProductWithImages_WithNullOwner_ShouldReturnError() {
         // Arrange
         MultipartFile file = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test".getBytes());
 
         // Act
-        boolean result = productService.saveProductWithImages(file, null, testProduct, null);
+        SaveResult result = productService.saveProductWithImages(file, null, testProduct, null);
 
         // Assert
-        assertFalse(result);
+        assertFalse(result.isSuccess());
+        assertEquals("Invalid product or owner data", result.getErrorMessage());
+        verify(productRepository, never()).save(any(Product.class));
+    }
+
+    @Test
+    void saveProductWithImages_WithInvalidPreviewImage_ShouldReturnError() {
+        // Arrange
+        MultipartFile file = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test".getBytes());
+        when(imageValidationService.validatePreviewImage(any()))
+                .thenReturn(ValidationResult.error("Preview image is invalid"));
+
+        // Act
+        SaveResult result = productService.saveProductWithImages(file, null, testProduct, testUser);
+
+        // Assert
+        assertFalse(result.isSuccess());
+        assertEquals("Preview image is invalid", result.getErrorMessage());
+        verify(productRepository, never()).save(any(Product.class));
+    }
+
+    @Test
+    void saveProductWithImages_WithInvalidAdditionalImages_ShouldReturnError() {
+        // Arrange
+        MultipartFile previewFile = new MockMultipartFile("file", "preview.jpg", "image/jpeg", "test".getBytes());
+        List<MultipartFile> additionalFiles = List.of(
+                new MockMultipartFile("file", "additional.jpg", "image/jpeg", "test".getBytes())
+        );
+
+        when(imageValidationService.validatePreviewImage(any())).thenReturn(ValidationResult.success());
+        when(imageValidationService.validateAdditionalImages(any()))
+                .thenReturn(ValidationResult.error("Too many images"));
+
+        // Act
+        SaveResult result = productService.saveProductWithImages(previewFile, additionalFiles, testProduct, testUser);
+
+        // Assert
+        assertFalse(result.isSuccess());
+        assertEquals("Too many images", result.getErrorMessage());
         verify(productRepository, never()).save(any(Product.class));
     }
 }

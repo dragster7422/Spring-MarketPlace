@@ -3,6 +3,7 @@ package com.example.controllers;
 import com.example.models.Product;
 import com.example.models.User;
 import com.example.services.ProductService;
+import com.example.services.ProductService.SaveResult;
 import com.example.services.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @Controller
@@ -62,27 +62,25 @@ public class ProductController {
                              @AuthenticationPrincipal User currentUser,
                              Model model) {
 
-        boolean isPreviewImageMissing = false;
-        if(previewImage == null || previewImage.isEmpty()) {
-            model.addAttribute("errorPreviewImageMissing", "Preview image is required");
-            isPreviewImageMissing = true;
-        }
-
-        if(bindingResult.hasErrors() || isPreviewImageMissing) {
+        if(bindingResult.hasErrors()) {
             return "product-add";
         }
 
+        // Check if user is authenticated
         if(currentUser == null) {
             return "redirect:/logout";
         }
 
-        try {
-            if(!productService.saveProductWithImages(previewImage, additionalImages, product, currentUser)) {
-                model.addAttribute("errorSaving", "Failed to save product. Please try again.");
-                return "product-add";
-            }
-        } catch (IOException e) {
-            model.addAttribute("errorSaving", "Error uploading images: " + e.getMessage());
+        // Save product with validation
+        SaveResult result = productService.saveProductWithImages(
+                previewImage,
+                additionalImages,
+                product,
+                currentUser
+        );
+
+        if(!result.isSuccess()) {
+            model.addAttribute("errorSaving", result.getErrorMessage());
             return "product-add";
         }
 
@@ -121,7 +119,7 @@ public class ProductController {
             return "redirect:/";
         }
 
-        // Checking access rights
+        // Check access rights
         if(!productService.isOwner(product, currentUser)) {
             model.addAttribute("errorAccess", "You don't have permission to edit this product");
             return "redirect:/product/" + id;
@@ -141,7 +139,7 @@ public class ProductController {
                               @AuthenticationPrincipal User currentUser,
                               Model model) {
 
-        // Checking access rights
+        // Check access rights
         Product dbProduct = productService.getById(id);
         if(dbProduct == null) {
             return "redirect:/";
@@ -155,8 +153,18 @@ public class ProductController {
             return "product-edit";
         }
 
-        if(!productService.updateProduct(id, previewImage, additionalImages, removeImageIds, product)) {
-            model.addAttribute("errorSaving", "Failed to update product. Please try again.");
+        // Update product with validation
+        SaveResult result = productService.updateProduct(
+                id,
+                previewImage,
+                additionalImages,
+                removeImageIds,
+                product
+        );
+
+        if (!result.isSuccess()) {
+            model.addAttribute("errorSaving", result.getErrorMessage());
+            model.addAttribute("product", dbProduct);
             return "product-edit";
         }
 
@@ -169,7 +177,7 @@ public class ProductController {
     public String productDelete(@PathVariable Long id,
                                 @AuthenticationPrincipal User currentUser) {
 
-        // Checking access rights
+        // Check access rights
         Product product = productService.getById(id);
         if(product == null) {
             return "redirect:/";
