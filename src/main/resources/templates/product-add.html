@@ -33,11 +33,27 @@
         <!-- Back button -->
         <a th:href="@{/}" class="btn-back">Back</a>
 
+        <!-- Error Message -->
+        <div th:if="${errorSaving}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Error:</strong> <span th:text="${errorSaving}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
         <!-- Form add product -->
         <form th:action="@{/product/add}" method="post" enctype="multipart/form-data" th:object="${product}">
             <div class="mb-4">
                 <label for="previewImage" class="form-label fw-semibold">Preview Image *</label>
-                <input class="form-control" type="file" id="previewImage" name="previewImage" accept="image/*" onchange="handlePreviewImage(event)">
+                <input class="form-control"
+                       type="file"
+                       id="previewImage"
+                       name="previewImage"
+                       accept="image/jpeg,image/png,image/webp,image/avif"
+                       onchange="handlePreviewImage(event)">
+                <div class="form-text">
+                    <small>
+                        <strong>Requirements:</strong> JPG, PNG, WebP, or AVIF. Maximum size: 5MB
+                    </small>
+                </div>
                 <div th:text="${errorPreviewImageMissing}" class="text-danger small mt-1"></div>
 
                 <!-- Preview Image Container -->
@@ -46,7 +62,18 @@
 
             <div class="mb-4">
                 <label for="additionalImages" class="form-label fw-semibold">Additional Images</label>
-                <input class="form-control" type="file" id="additionalImages" name="additionalImages" accept="image/*" multiple onchange="handleAdditionalImages(event)">
+                <input class="form-control"
+                       type="file"
+                       id="additionalImages"
+                       name="additionalImages"
+                       accept="image/jpeg,image/png,image/webp,image/avif"
+                       multiple
+                       onchange="handleAdditionalImages(event)">
+                <div class="form-text">
+                    <small>
+                        <strong>Optional:</strong> Maximum 10 images. Each up to 5MB. Total request: 25MB max
+                    </small>
+                </div>
 
                 <!-- Additional Images Container -->
                 <div id="additionalImagesContainer" class="image-preview-container"></div>
@@ -90,12 +117,38 @@
     let previewImageFile = null;
     let additionalImagesFiles = [];
 
+    const MAX_ADDITIONAL_IMAGES = 10;
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
+    function validateFileSize(file) {
+        if (file.size > MAX_FILE_SIZE) {
+            alert(`File "${file.name}" exceeds maximum size of 5MB`);
+            return false;
+        }
+        return true;
+    }
+
+    function validateFileType(file) {
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
+        if (!allowedTypes.includes(file.type)) {
+            alert(`File "${file.name}" is not a valid image format. Allowed: JPG, PNG, WebP, AVIF`);
+            return false;
+        }
+        return true;
+    }
+
     function handlePreviewImage(event) {
         const file = event.target.files[0];
         const container = document.getElementById('previewImageContainer');
         container.innerHTML = '';
 
         if (file) {
+            // Validate file
+            if (!validateFileType(file) || !validateFileSize(file)) {
+                event.target.value = '';
+                return;
+            }
+
             previewImageFile = file;
             const reader = new FileReader();
 
@@ -134,6 +187,22 @@
         const files = Array.from(event.target.files);
         const container = document.getElementById('additionalImagesContainer');
         container.innerHTML = '';
+
+        // Check count
+        if (files.length > MAX_ADDITIONAL_IMAGES) {
+            alert(`Maximum ${MAX_ADDITIONAL_IMAGES} additional images allowed`);
+            event.target.value = '';
+            return;
+        }
+
+        // Validate all files
+        for (let file of files) {
+            if (!validateFileType(file) || !validateFileSize(file)) {
+                event.target.value = '';
+                return;
+            }
+        }
+
         additionalImagesFiles = files;
 
         files.forEach((file, index) => {

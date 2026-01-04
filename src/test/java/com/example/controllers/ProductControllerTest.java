@@ -6,6 +6,7 @@ import com.example.models.ProductImage;
 import com.example.models.User;
 import com.example.models.enums.Role;
 import com.example.services.ProductService;
+import com.example.services.ProductService.SaveResult;
 import com.example.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -125,7 +126,8 @@ class ProductControllerTest {
         MockMultipartFile previewImage = new MockMultipartFile(
                 "previewImage", "test.jpg", "image/jpeg", "test".getBytes());
 
-        when(productService.saveProductWithImages(any(), any(), any(), any())).thenReturn(true);
+        when(productService.saveProductWithImages(any(), any(), any(), any()))
+                .thenReturn(SaveResult.success());
 
         // Act & Assert
         mockMvc.perform(multipart("/product/add")
@@ -148,6 +150,10 @@ class ProductControllerTest {
         MockMultipartFile emptyPreviewImage = new MockMultipartFile(
                 "previewImage", "", "image/jpeg", new byte[0]);
 
+        // Mock the service to return error when preview image is empty
+        when(productService.saveProductWithImages(any(), any(), any(), any()))
+                .thenReturn(SaveResult.error("Preview image is required"));
+
         // Act & Assert
         mockMvc.perform(multipart("/product/add")
                         .file(emptyPreviewImage)
@@ -158,8 +164,6 @@ class ProductControllerTest {
                         .param("price", "99.99"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("product-add"));
-
-        verify(productService, never()).saveProductWithImages(any(), any(), any(), any());
     }
 
     @Test
@@ -253,7 +257,8 @@ class ProductControllerTest {
         // Arrange
         when(productService.getById(anyLong())).thenReturn(testProduct);
         when(productService.isOwner(any(), any())).thenReturn(true);
-        when(productService.updateProduct(anyLong(), any(), any(), any(), any())).thenReturn(true);
+        when(productService.updateProduct(anyLong(), any(), any(), any(), any()))
+                .thenReturn(SaveResult.success());
 
         // Act & Assert
         mockMvc.perform(multipart("/product/1/edit")
