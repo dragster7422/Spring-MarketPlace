@@ -20,8 +20,9 @@ public class Product {
     @SequenceGenerator(name = "products_seq", sequenceName = "products_seq_id", allocationSize = 1)
     private Long id;
 
-    @Column
+    @Column(length = 80)
     @NotBlank(message = "The title cannot be empty")
+    @Size(min = 10, max = 80, message = "The title must contain at least 10 and no more than 80 characters.")
     private String title;
 
     @Column(length = 600)
