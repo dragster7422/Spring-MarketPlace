@@ -563,6 +563,28 @@ body.main-page {
     color: var(--text-primary);
 }
 
+/* Character counter styling */
+.form-control[maxlength] {
+    margin-bottom: 0;
+}
+
+.text-muted {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.text-danger {
+    font-weight: 600;
+}
+
+.text-warning {
+    font-weight: 600;
+}
+
+.text-success {
+    font-weight: 600;
+}
+
 /* --------------------------------------------
    RESPONSIVE DESIGN
    -------------------------------------------- */
