@@ -81,14 +81,32 @@
 
             <div class="mb-4">
                 <label for="title" class="form-label fw-semibold">Title *</label>
-                <input class="form-control" type="text" id="title" th:field="*{title}" placeholder="Enter product title">
-                <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="text-danger small mt-1">Title Error</div>
+                <input class="form-control"
+                       type="text"
+                       id="title"
+                       th:field="*{title}"
+                       placeholder="Enter product title"
+                       maxlength="80"
+                       oninput="updateCharCount('title', 'titleCount', 10, 80)">
+                <div class="d-flex justify-content-between align-items-center mt-1">
+                    <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="text-danger small">Title Error</div>
+                    <small id="titleCount" class="text-muted">0/80</small>
+                </div>
             </div>
 
             <div class="mb-4">
                 <label for="description" class="form-label fw-semibold">Description *</label>
-                <textarea class="form-control" id="description" th:field="*{description}" rows="6" placeholder="Enter product description"></textarea>
-                <div th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="text-danger small mt-1">Description Error</div>
+                <textarea class="form-control"
+                          id="description"
+                          th:field="*{description}"
+                          rows="6"
+                          placeholder="Enter product description"
+                          maxlength="600"
+                          oninput="updateCharCount('description', 'descriptionCount', 20, 600)"></textarea>
+                <div class="d-flex justify-content-between align-items-center mt-1">
+                    <div th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="text-danger small">Description Error</div>
+                    <small id="descriptionCount" class="text-muted">0/600</small>
+                </div>
             </div>
 
             <div class="mb-4">
@@ -119,6 +137,30 @@
 
     const MAX_ADDITIONAL_IMAGES = 10;
     const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
+    // Character counter function
+    function updateCharCount(fieldId, counterId, minChars, maxChars) {
+        const field = document.getElementById(fieldId);
+        const counter = document.getElementById(counterId);
+        const currentLength = field.value.length;
+
+        counter.textContent = currentLength + '/' + maxChars;
+
+        // Color coding based on length
+        if (currentLength < minChars) {
+            counter.className = 'text-danger';
+        } else if (currentLength > maxChars * 0.9) {
+            counter.className = 'text-warning';
+        } else {
+            counter.className = 'text-success';
+        }
+    }
+
+    // Initialize counters on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        updateCharCount('title', 'titleCount', 10, 80);
+        updateCharCount('description', 'descriptionCount', 20, 600);
+    });
 
     function validateFileSize(file) {
         if (file.size > MAX_FILE_SIZE) {
