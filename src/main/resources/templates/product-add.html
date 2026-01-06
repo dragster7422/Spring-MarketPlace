@@ -51,7 +51,7 @@
                        onchange="handlePreviewImage(event)">
                 <div class="form-text">
                     <small>
-                        <strong>Requirements:</strong> JPG, PNG, WebP, or AVIF. Maximum size: 5MB
+                        <strong>Requirements:</strong> JPG, PNG, WebP, or AVIF. Maximum size: 6MB
                     </small>
                 </div>
                 <div th:text="${errorPreviewImageMissing}" class="text-danger small mt-1"></div>
@@ -71,7 +71,7 @@
                        onchange="handleAdditionalImages(event)">
                 <div class="form-text">
                     <small>
-                        <strong>Optional:</strong> Maximum 10 images. Each up to 5MB. Total request: 25MB max
+                        <strong>Optional:</strong> Maximum 10 images. Each up to 6MB. Total request: 30MB max
                     </small>
                 </div>
 
@@ -136,7 +136,7 @@
     let additionalImagesFiles = [];
 
     const MAX_ADDITIONAL_IMAGES = 10;
-    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+    const MAX_FILE_SIZE = 6 * 1024 * 1024; // 6MB
 
     // Character counter function
     function updateCharCount(fieldId, counterId, minChars, maxChars) {
@@ -164,7 +164,7 @@
 
     function validateFileSize(file) {
         if (file.size > MAX_FILE_SIZE) {
-            alert(`File "${file.name}" exceeds maximum size of 5MB`);
+            alert(`File "${file.name}" exceeds maximum size of 6MB`);
             return false;
         }
         return true;

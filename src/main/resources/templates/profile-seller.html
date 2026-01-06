@@ -73,7 +73,7 @@
                 <a th:href="@{'/product/' + ${product.id}}"
                    class="product-card-horizontal text-decoration-none"
                    th:each="product : ${products}">
-                    <div class="d-flex gap-3 flex-grow-1">
+                    <div class="d-flex flex-column flex-md-row gap-3 flex-grow-1">
                         <!-- Image -->
                         <div class="product-horizontal-image">
                             <img th:if="${product.getPreviewImageUrl() != null}"

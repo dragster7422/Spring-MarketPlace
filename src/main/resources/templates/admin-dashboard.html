@@ -131,77 +131,80 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="user : ${users}"
-                    th:classappend="${user.id == currentAdmin.id} ? 'table-primary'">
-                    <td th:text="${user.id}">1</td>
-                    <td>
-                        <strong th:text="${user.username}">Username</strong>
-                        <span th:if="${user.id == currentAdmin.id}" class="badge bg-info ms-2">You</span>
-                    </td>
-                    <td th:text="${user.email}">email@example.com</td>
-                    <td>
-                        <div class="d-flex flex-wrap gap-1">
+                    <tr th:each="user : ${users}"
+                        th:classappend="${user.id == currentAdmin.id} ? 'table-primary'">
+                        <td th:text="${user.id}">1</td>
+                        <td>
+                            <a th:href="@{'/seller/' + ${user.id}}" class="text-decoration-none">
+                                <strong th:text="${user.username}">Username</strong>
+                                <span th:if="${user.id == currentAdmin.id}" class="badge bg-info ms-2">You</span>
+                            </a>
+                        </td>
+                        <td th:text="${user.email}">email@example.com</td>
+                        <td>
+                            <div class="d-flex flex-wrap gap-1">
                                 <span th:each="role : ${user.roles}"
                                       th:classappend="${role.name() == 'ROLE_ADMIN'} ? 'badge bg-danger' : 'badge bg-secondary'"
                                       th:text="${#strings.replace(role.name(), 'ROLE_', '')}">
                                     ROLE
                                 </span>
-                        </div>
-                    </td>
-                    <td>
-                        <span th:if="${user.active}" class="badge bg-success">Active</span>
-                        <span th:unless="${user.active}" class="badge bg-warning text-dark">Banned</span>
-                    </td>
-                    <td th:text="${#temporals.format(user.createdAt, 'dd.MM.yyyy')}">01.01.2025</td>
-                    <td>
-                        <div class="dropdown">
-                            <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button"
-                                    th:id="'dropdownMenuButton' + ${user.id}"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                Actions
-                            </button>
-                            <ul class="dropdown-menu" th:aria-labelledby="'dropdownMenuButton' + ${user.id}">
-                                <!-- Toggle Ban/Unban -->
-                                <li th:if="${user.id != currentAdmin.id}">
-                                    <form th:action="@{'/profile/admin/dashboard/user/' + ${user.id} + '/toggle-ban'}" method="post" class="d-inline">
-                                        <button type="submit" class="dropdown-item"
-                                                th:text="${user.active} ? 'Ban User' : 'Unban User'">
-                                            Ban/Unban
-                                        </button>
-                                    </form>
-                                </li>
+                            </div>
+                        </td>
+                        <td>
+                            <span th:if="${user.active}" class="badge bg-success">Active</span>
+                            <span th:unless="${user.active}" class="badge bg-warning text-dark">Banned</span>
+                        </td>
+                        <td th:text="${#temporals.format(user.createdAt, 'dd.MM.yyyy')}">01.01.2025</td>
+                        <td>
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button"
+                                        th:id="'dropdownMenuButton' + ${user.id}"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                    Actions
+                                </button>
+                                <ul class="dropdown-menu" th:aria-labelledby="'dropdownMenuButton' + ${user.id}">
 
-                                <li><hr class="dropdown-divider"></li>
+                                    <!-- Toggle Ban/Unban -->
+                                    <li th:if="${user.id != currentAdmin.id}">
+                                        <form th:action="@{'/profile/admin/dashboard/user/' + ${user.id} + '/toggle-ban'}" method="post" class="d-inline">
+                                            <button type="submit" class="dropdown-item"
+                                                    th:text="${user.active} ? 'Ban User' : 'Unban User'">
+                                                Ban/Unban
+                                            </button>
+                                        </form>
+                                    </li>
 
-                                <!-- Add Role ADMIN -->
-                                <li th:if="${!user.hasRole(T(com.example.models.enums.Role).ROLE_ADMIN)}">
-                                    <form th:action="@{'/profile/admin/dashboard/user/' + ${user.id} + '/add-role'}" method="post" class="d-inline">
-                                        <input type="hidden" name="role" value="ROLE_ADMIN">
-                                        <button type="submit" class="dropdown-item">Add ADMIN Role</button>
-                                    </form>
-                                </li>
+                                    <li><hr class="dropdown-divider"></li>
 
-                                <!-- Remove Role ADMIN -->
-                                <li th:if="${user.hasRole(T(com.example.models.enums.Role).ROLE_ADMIN) && user.id != currentAdmin.id}">
-                                    <form th:action="@{'/profile/admin/dashboard/user/' + ${user.id} + '/remove-role'}" method="post" class="d-inline">
-                                        <input type="hidden" name="role" value="ROLE_ADMIN">
-                                        <button type="submit" class="dropdown-item text-warning">Remove ADMIN Role</button>
-                                    </form>
-                                </li>
+                                    <!-- Add Role ADMIN -->
+                                    <li th:if="${!user.hasRole(T(com.example.models.enums.Role).ROLE_ADMIN)}">
+                                        <form th:action="@{'/profile/admin/dashboard/user/' + ${user.id} + '/add-role'}" method="post" class="d-inline">
+                                            <input type="hidden" name="role" value="ROLE_ADMIN">
+                                            <button type="submit" class="dropdown-item">Add ADMIN Role</button>
+                                        </form>
+                                    </li>
 
-                                <li><hr class="dropdown-divider"></li>
+                                    <!-- Remove Role ADMIN -->
+                                    <li th:if="${user.hasRole(T(com.example.models.enums.Role).ROLE_ADMIN) && user.id != currentAdmin.id}">
+                                        <form th:action="@{'/profile/admin/dashboard/user/' + ${user.id} + '/remove-role'}" method="post" class="d-inline">
+                                            <input type="hidden" name="role" value="ROLE_ADMIN">
+                                            <button type="submit" class="dropdown-item text-warning">Remove ADMIN Role</button>
+                                        </form>
+                                    </li>
 
-                                <!-- Delete User -->
-                                <li th:if="${user.id != currentAdmin.id}">
-                                    <form th:action="@{'/profile/admin/dashboard/user/' + ${user.id} + '/delete'}" method="post"
-                                          onsubmit="return confirm('Are you sure you want to delete this user? This action cannot be undone.');">
-                                        <button type="submit" class="dropdown-item text-danger">Delete User</button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
+                                    <li><hr class="dropdown-divider"></li>
+
+                                    <!-- Delete User -->
+                                    <li th:if="${user.id != currentAdmin.id}">
+                                        <form th:action="@{'/profile/admin/dashboard/user/' + ${user.id} + '/delete'}" method="post"
+                                              onsubmit="return confirm('Are you sure you want to delete this user? This action cannot be undone.');">
+                                            <button type="submit" class="dropdown-item text-danger">Delete User</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>

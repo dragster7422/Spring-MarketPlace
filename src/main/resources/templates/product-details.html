@@ -41,7 +41,10 @@
         <div class="row g-4">
             <!-- Image Carousel -->
             <div class="col-md-6">
-                <div id="productCarousel" class="carousel slide" th:if="${!#lists.isEmpty(product.sortedImages)}">
+                <div id="productCarousel"
+                     class="carousel slide"
+                     data-bs-touch="true"
+                     th:if="${!#lists.isEmpty(product.sortedImages)}">
                     <!-- Carousel Indicators -->
                     <div class="carousel-indicators" th:if="${#lists.size(product.sortedImages) > 1}">
                         <button type="button"
@@ -81,6 +84,16 @@
                          th:alt="'Thumbnail ' + ${iterStat.count} + ' for ' + ${product.title}"
                          th:classappend="${iterStat.index == 0} ? 'active'"
                          th:onclick="'setCarouselSlide(' + ${iterStat.index} + ')'">
+                </div>
+
+                <!-- Mobile: Swipe indicator -->
+                <div class="d-md-none text-center mt-3" th:if="${#lists.size(product.sortedImages) > 1}">
+                    <small class="text-muted">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-hand-index-thumb" viewBox="0 0 16 16">
+                            <path d="M6.75 1a.75.75 0 0 1 .75.75V8a.5.5 0 0 0 1 0V5.467l.086-.004c.317-.012.637-.008.816.027.134.027.294.096.448.182.077.042.15.147.15.314V8a.5.5 0 0 0 1 0V6.435l.106-.01c.316-.024.584-.01.708.04.118.046.3.207.486.43.3.36.515.995.515 1.605 0 .656.218 1.259.57 1.67.29.34.774.66 1.425.66.653 0 1.107-.32 1.38-.66.35-.41.568-1.014.568-1.67V5.5A1.5 1.5 0 0 0 13.5 4H12v-.5a1.5 1.5 0 0 0-1.5-1.5H9.415a1.5 1.5 0 0 0-1.06.44L6.5 4.293 6 3.793V1.75A.75.75 0 0 1 6.75 1zM8.5 4.466V1.75a1.75 1.75 0 1 0-3.5 0v6.543L3.443 6.736A1.5 1.5 0 0 0 1.378 8.8l1.06 1.06A4.5 4.5 0 0 0 5.627 11h1.873v3.5a.5.5 0 0 0 .5.5h1.5a.5.5 0 0 0 .5-.5V11h1.873a4.5 4.5 0 0 0 3.189-1.32l1.06-1.06a1.5 1.5 0 0 0-2.122-2.122L13 7.957V5.5a.5.5 0 0 0-.5-.5H11v1.466a.5.5 0 0 1-1 0V4a.5.5 0 0 0-.5-.5h-1z"/>
+                        </svg>
+                        Swipe to view more photos
+                    </small>
                 </div>
             </div>
 
@@ -143,6 +156,42 @@
             thumb.classList.toggle('active', i === index);
         });
     }
+
+    // Enable swipe gestures on mobile
+    document.addEventListener('DOMContentLoaded', function() {
+        const carousel = document.getElementById('productCarousel');
+        if (carousel) {
+            // Bootstrap 5 has built-in touch support with data-bs-touch="true"
+            // Additional swipe handling for smoother experience
+            let touchStartX = 0;
+            let touchEndX = 0;
+
+            carousel.addEventListener('touchstart', function(e) {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+
+            carousel.addEventListener('touchend', function(e) {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, { passive: true });
+
+            function handleSwipe() {
+                const swipeThreshold = 50;
+                const diff = touchStartX - touchEndX;
+
+                if (Math.abs(diff) > swipeThreshold) {
+                    const carouselInstance = bootstrap.Carousel.getOrCreateInstance(carousel);
+                    if (diff > 0) {
+                        // Swipe left - next
+                        carouselInstance.next();
+                    } else {
+                        // Swipe right - prev
+                        carouselInstance.prev();
+                    }
+                }
+            }
+        }
+    });
 </script>
 </body>
 </html>

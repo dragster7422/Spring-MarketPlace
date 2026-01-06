@@ -13,8 +13,8 @@ import java.util.Set;
 @Service
 public class ImageValidationService {
 
-    // Max file size: 5MB
-    private static final long MAX_FILE_SIZE = 5 * 1024 * 1024;
+    // Max file size: 6MB
+    private static final long MAX_FILE_SIZE = 6 * 1024 * 1024;
 
     // Max additional images count
     private static final int MAX_ADDITIONAL_IMAGES = 10;
