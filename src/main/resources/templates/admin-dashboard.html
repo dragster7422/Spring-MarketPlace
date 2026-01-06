@@ -135,8 +135,10 @@
                     th:classappend="${user.id == currentAdmin.id} ? 'table-primary'">
                     <td th:text="${user.id}">1</td>
                     <td>
-                        <strong th:text="${user.username}">Username</strong>
-                        <span th:if="${user.id == currentAdmin.id}" class="badge bg-info ms-2">You</span>
+                        <a th:href="@{'/seller/' + ${user.id}}" class="text-decoration-none">
+                            <strong th:text="${user.username}">Username</strong>
+                            <span th:if="${user.id == currentAdmin.id}" class="badge bg-info ms-2">You</span>
+                        </a>
                     </td>
                     <td th:text="${user.email}">email@example.com</td>
                     <td>
@@ -161,6 +163,7 @@
                                 Actions
                             </button>
                             <ul class="dropdown-menu" th:aria-labelledby="'dropdownMenuButton' + ${user.id}">
+
                                 <!-- Toggle Ban/Unban -->
                                 <li th:if="${user.id != currentAdmin.id}">
                                     <form th:action="@{'/profile/admin/dashboard/user/' + ${user.id} + '/toggle-ban'}" method="post" class="d-inline">

@@ -690,3 +690,149 @@ textarea:focus-visible {
     outline: 2px solid var(--primary-color);
     outline-offset: 2px;
 }
+
+/* ============================================
+   MOBILE ADAPTATIONS FOR HORIZONTAL CARDS
+   Add this to the end of styles.css
+   ============================================ */
+
+/* Mobile: Stack horizontal cards vertically */
+@media (max-width: 768px) {
+    /* Horizontal Product Cards - Mobile Layout */
+    .product-card-horizontal {
+        flex-direction: column !important;
+        gap: 0.75rem;
+    }
+
+    .product-horizontal-image {
+        width: 100% !important;
+        height: 200px !important;
+        flex-shrink: 0;
+    }
+
+    .product-horizontal-actions {
+        width: 100% !important;
+        flex-direction: row !important;
+        gap: 0.5rem;
+    }
+
+    .product-horizontal-actions .btn {
+        flex: 1;
+        font-size: 0.875rem;
+        padding: 0.5rem 1rem;
+    }
+
+    /* Ensure proper text display on mobile */
+    .product-horizontal-title {
+        font-size: 1.1rem;
+        -webkit-line-clamp: 2;
+    }
+
+    .product-horizontal-description {
+        font-size: 0.875rem;
+        -webkit-line-clamp: 3;
+    }
+
+    .product-horizontal-price {
+        font-size: 1.2rem;
+        margin-top: 0.5rem;
+    }
+
+    /* Product Details Page - Mobile */
+    .product-container {
+        padding: var(--spacing-md);
+    }
+
+    .product-title {
+        font-size: 1.5rem;
+    }
+
+    .product-detail-image {
+        height: 280px;
+    }
+
+    .product-details-price {
+        font-size: 1.5rem;
+    }
+
+    /* Thumbnail gallery visible on mobile with adjusted size */
+    .thumbnail-gallery {
+        gap: 6px;
+        margin-top: 8px;
+    }
+
+    .thumbnail {
+        width: 50px;
+        height: 50px;
+    }
+
+    /* Carousel controls more visible on mobile */
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 10%;
+        opacity: 0.8;
+    }
+
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        width: 30px;
+        height: 30px;
+    }
+
+    /* Carousel indicators larger on mobile */
+    .carousel-indicators [data-bs-target] {
+        width: 12px;
+        height: 12px;
+    }
+
+    /* Seller block on mobile */
+    .seller-block {
+        padding: 1rem !important;
+    }
+
+    .seller-block .seller-avatar {
+        width: 50px !important;
+        height: 50px !important;
+    }
+
+    .seller-block .seller-avatar svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    .seller-block p.fs-5 {
+        font-size: 1.1rem !important;
+    }
+
+    /* Buy button full width on mobile */
+    .btn-buy {
+        width: 100%;
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+    }
+
+    /* Back button on mobile */
+    .btn-back {
+        font-size: 0.875rem;
+        padding: 0.375rem 0.75rem;
+    }
+}
+
+/* Tablet: Adjust horizontal cards */
+@media (min-width: 769px) and (max-width: 991px) {
+    .product-horizontal-image {
+        width: 140px !important;
+        height: 140px !important;
+    }
+
+    .product-horizontal-actions {
+        width: 90px !important;
+    }
+}
+
+/* Desktop: Show thumbnail gallery */
+@media (min-width: 769px) {
+    .thumbnail-gallery {
+        display: flex !important;
+    }
+}
