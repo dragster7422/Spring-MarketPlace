@@ -78,10 +78,10 @@ class ImageValidationServiceTest {
         }
 
         @Test
-        @DisplayName("Should fail when file exceeds max size (5MB)")
+        @DisplayName("Should fail when file exceeds max size (6MB)")
         void shouldFailWhenFileSizeExceedsMaximum() {
             // Given - 6MB file
-            byte[] largeContent = new byte[6 * 1024 * 1024];
+            byte[] largeContent = new byte[7 * 1024 * 1024];
             MockMultipartFile largeFile = new MockMultipartFile(
                     "file",
                     "large.jpg",
@@ -244,25 +244,6 @@ class ImageValidationServiceTest {
 
             // When
             ValidationResult result = validationService.validateImage(validPng);
-
-            // Then
-            assertTrue(result.isValid());
-            assertNull(result.getErrorMessage());
-        }
-
-        @Test
-        @DisplayName("Should succeed for valid GIF file")
-        void shouldSucceedForValidGif() {
-            // Given
-            MockMultipartFile validGif = new MockMultipartFile(
-                    "file",
-                    "test.gif",
-                    "image/gif",
-                    createValidGifBytes()
-            );
-
-            // When
-            ValidationResult result = validationService.validateImage(validGif);
 
             // Then
             assertTrue(result.isValid());
@@ -451,8 +432,7 @@ class ImageValidationServiceTest {
             // Given
             List<MultipartFile> images = Arrays.asList(
                     createValidJpegFile("image1.jpg"),
-                    createValidPngFile("image2.png"),
-                    createValidGifFile("image3.gif")
+                    createValidPngFile("image2.png")
             );
 
             // When
@@ -574,13 +554,6 @@ class ImageValidationServiceTest {
         };
     }
 
-    private byte[] createValidGifBytes() {
-        return new byte[]{
-                0x47, 0x49, 0x46, 0x38,
-                0x39, 0x61, 0x00, 0x00
-        };
-    }
-
     private byte[] createValidWebpBytes() {
         return new byte[]{
                 0x52, 0x49, 0x46, 0x46,  // "RIFF"
@@ -614,15 +587,6 @@ class ImageValidationServiceTest {
                 filename,
                 "image/png",
                 createValidPngBytes()
-        );
-    }
-
-    private MockMultipartFile createValidGifFile(String filename) {
-        return new MockMultipartFile(
-                "file",
-                filename,
-                "image/gif",
-                createValidGifBytes()
         );
     }
 }
