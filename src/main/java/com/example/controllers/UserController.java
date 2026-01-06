@@ -80,8 +80,9 @@ public class UserController {
             return "profile-edit";
         }
 
-        // Update user session if username changed
-        if (!updateDto.getUsername().equals(user.getUsername())) {
+        // Update user session if username or email changed
+        if (updateDto.getUsername() != null && !updateDto.getUsername().equals(user.getUsername()) ||
+                updateDto.getEmail() != null && !updateDto.getEmail().equals(user.getEmail())) {
             User updatedUser = userService.getByUsername(updateDto.getUsername());
 
             Authentication authentication = new UsernamePasswordAuthenticationToken(
